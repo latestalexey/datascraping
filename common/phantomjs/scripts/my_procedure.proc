@@ -1,0 +1,63 @@
+"use strict";
+
+//Тут объявляю несколько юзерагентов, типа мы под разными браузерами заходим постоянно
+var useragent = [];
+useragent.push('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36');
+useragent.push('Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/58.0');
+useragent.push('Opera/12.02 (Android 4.1; Linux; Opera Mobi/ADR-1111101157; U; en-US) Presto/2.9.201 Version/12.02');
+
+
+var siteUrl = 'https://www.avito.ru/mytischi/nedvizhimost';
+var page = require('webpage').create();
+
+//Это я передаю заголовки 
+//Их можно посмотреть в браузере на закладке Network (тыкайте сами, ищите сами)
+page.customHeaders = {
+    ":host": "www.avito.ru",
+    ":method": "GET",
+    ":path": "/mytischi/nedvizhimost",
+    ":scheme": "https",
+    ":version": "HTTP/1.1",
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "accept-language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,bg;q=0.6,da;q=0.5,de;q=0.4,fr;q=0.3,lt;q=0.2,nl;q=0.1,fil;q=0.1,tr;q=0.1,es;q=0.1,it;q=0.1,bs;q=0.1,la;q=0.1",
+    "cache-control": "max-age=0",
+    "upgrade-insecure-requests": "1",
+    "accept-encoding":"gzip, deflate, br",
+    "user-agent": useragent[Math.floor(Math.random() * useragent.length)]
+};
+
+//Здесь я отключаю загрузку сторонних скриптов для ускореняи парсинга
+page.onResourceRequested = function (requestData, request) {
+    if ((/http:\/\/.+?\.css$/gi).test(requestData['url'])) {
+        request.abort();
+    }
+    if (
+            (/\.doubleclick\./gi.test(requestData['url'])) ||
+            (/\.pubmatic\.com$/gi.test(requestData['url'])) ||
+            (/yandex/gi.test(requestData['url'])) ||
+            (/google/gi.test(requestData['url'])) ||
+            (/gstatic/gi.test(requestData['url']))
+            ) {
+        request.abort();
+        return;
+    }
+};
+
+//Этот код выводит ошибки, дебаг так сказать
+page.onError = function (msg, trace) {
+    console.log(msg);
+    trace.forEach(function (item) {
+        console.log('  ', item.file, ':', item.line);
+    });
+};
+
+//Здесь мы открываем страничку
+page.open(siteUrl, function (status) {
+    if (status !== 'success') {
+        console.log('Unable to access network');
+    } else {
+        
+      //Выведем
+      console.log('123');
+    }
+});
